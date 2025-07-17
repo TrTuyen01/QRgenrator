@@ -8,85 +8,78 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 0;
+      padding: 20px;
     }
     .header {
       display: flex;
       align-items: center;
-      padding: 10px 20px;
+      justify-content: flex-start;
+      padding-bottom: 20px;
     }
     .header img {
-      height: 40px;
-      margin-right: 10px;
-    }
-    .header span {
-      font-size: 20px;
-      font-weight: bold;
-    }
-    .content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 30px;
+      height: 50px;
     }
     input, button {
       padding: 10px;
-      margin: 10px;
-      width: 300px;
+      margin: 10px 0;
+      width: 100%;
+      max-width: 600px;
       font-size: 16px;
     }
-    .qr-grid {
+    .qr-container {
       display: flex;
       flex-wrap: wrap;
-      justify-content: center;
       gap: 20px;
-      max-width: 1200px;
-      margin: 30px auto;
+      max-width: 1220px;
+      margin-top: 30px;
     }
     .qr-item {
-      width: 120px;
+      width: 192px;
       text-align: center;
     }
-    .qr-item canvas {
-      width: 100px;
-      height: 100px;
+    canvas {
       margin-bottom: 5px;
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <img src="logo.png" alt="FPT Logo">
+    <img src="logo.png" alt="FPT Yên Khánh Logo" />
   </div>
 
-  <div class="content">
-    <h2>Tạo mã QR</h2>
-    <input type="text" id="text" placeholder="Nhập nhiều nội dung cách nhau bằng space hoặc dấu ' " />
-    <button onclick="generateQRs()">Tạo mã QR</button>
-  </div>
+  <h2>QRgenerator</h2>
+  <input type="text" id="text" placeholder="Nhập các nội dung cách nhau bằng dấu cách hoặc dấu nháy đơn" />
+  <button onclick="generateQR()">Tạo mã QR</button>
 
-  <div class="qr-grid" id="qrcode"></div>
+  <div class="qr-container" id="qrcode"></div>
 
   <script>
-    function generateQRs() {
-      const input = document.getElementById('text').value;
+    function generateQR() {
+      const input = document.getElementById('text').value.trim();
       const container = document.getElementById('qrcode');
-      container.innerHTML = "";
+      container.innerHTML = ''; // Xóa QR cũ
 
-      const parts = input.split(/[\s']+/).filter(item => item.trim() !== "");
+      if (!input) return;
 
-      parts.forEach(text => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'qr-item';
+      const parts = input.split(/[\s']+/); // Tách theo space hoặc dấu nháy đơn
 
-        QRCode.toCanvas(document.createElement('canvas'), text, function (err, canvas) {
-          if (err) console.error(err);
+      parts.forEach((text) => {
+        if (text.trim()) {
+          const div = document.createElement('div');
+          div.className = 'qr-item';
+
+          const canvas = document.createElement('canvas');
+          QRCode.toCanvas(canvas, text, { width: 192 }, function (error) {
+            if (error) console.error(error);
+          });
+
           const label = document.createElement('div');
           label.textContent = text;
-          wrapper.appendChild(canvas);
-          wrapper.appendChild(label);
-          container.appendChild(wrapper);
-        });
+
+          div.appendChild(canvas);
+          div.appendChild(label);
+          container.appendChild(div);
+        }
       });
     }
   </script>

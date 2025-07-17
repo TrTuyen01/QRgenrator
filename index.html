@@ -18,28 +18,43 @@
       width: 300px;
       font-size: 16px;
     }
-    canvas {
+    .qr-item {
       margin-top: 20px;
+      text-align: center;
+    }
+    canvas {
+      margin-bottom: 5px;
     }
   </style>
 </head>
 <body>
   <h2>QRgenerator</h2>
-  <input type="text" id="text" placeholder="Nhập nội dung cần tạo mã QR" />
-  <button onclick="generateQR()">Tạo mã QR</button>
+  <input type="text" id="text" placeholder="Nhập nhiều nội dung cách nhau bằng space hoặc dấu ' " />
+  <button onclick="generateQRs()">Tạo mã QR</button>
   <div id="qrcode"></div>
 
   <script>
-    function generateQR() {
-      const text = document.getElementById('text').value;
+    function generateQRs() {
+      const input = document.getElementById('text').value;
       const container = document.getElementById('qrcode');
-      container.innerHTML = ""; // Xóa QR cũ
-      if (text.trim() !== "") {
+      container.innerHTML = "";
+
+      // Tách các text theo khoảng trắng hoặc dấu '
+      const parts = input.split(/[\s']+/).filter(item => item.trim() !== "");
+
+      parts.forEach(text => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'qr-item';
+
         QRCode.toCanvas(document.createElement('canvas'), text, function (err, canvas) {
           if (err) console.error(err);
-          container.appendChild(canvas);
+          const label = document.createElement('div');
+          label.textContent = `Nội dung: ${text}`;
+          wrapper.appendChild(canvas);
+          wrapper.appendChild(label);
+          container.appendChild(wrapper);
         });
-      }
+      });
     }
   </script>
 </body>

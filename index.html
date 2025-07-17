@@ -9,74 +9,65 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin: 30px;
+            padding: 20px;
+            background: #fff;
         }
-        .logo {
-            width: 320px;
-            margin: 0 auto 10px;
+        img.logo {
+            max-width: 300px;
+            margin-bottom: 5px;
         }
-        .support {
-            font-size: 18px;
+        h2 {
             color: red;
-            margin-bottom: 20px;
-            font-weight: bold;
+            margin-top: 0;
+            font-size: 18px;
         }
-        .input-group {
-            margin-bottom: 20px;
-        }
-        #qrText {
-            width: 60%;
-            padding: 10px;
-            font-size: 16px;
-        }
-        button {
-            padding: 10px 20px;
+        input, button {
+            padding: 8px;
             margin: 5px;
             font-size: 16px;
-            cursor: pointer;
         }
-        .qr-container {
+        .qr-container, .barcode-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 30px 40px;
-            margin-top: 30px;
+            gap: 25px;
+            margin-top: 20px;
         }
         .qr-box {
             text-align: center;
-            width: 160px;
+            width: 170px;
         }
         .qr-box svg, .qr-box canvas {
             display: block;
             margin: 0 auto;
         }
-        .qr-box p {
-            margin-top: 8px;
-            font-weight: bold;
+        p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <img src="logo.png" alt="Yên Khánh Logo" class="logo">
-    <div class="support">Mã Vạch Hỗ Trợ: TuyenTA4@fpt.com - 0977989605</div>
 
-    <div class="input-group">
-        <input type="text" id="qrText" placeholder="'00800489 00906251 00910057'" />
-        <button onclick="generateQRCodes()">Tạo mã QR</button>
-        <button id="generateBarcode">Tạo mã vạch</button>
-    </div>
+    <img src="your-logo.png" class="logo" alt="Logo Yên Khánh">
+    <h2>Mã Vạch Hỗ Trợ: TuyenTA4@fpt.com - 0977989605</h2>
 
-    <div id="qrContainer" class="qr-container"></div>
-    <div id="barcodeContainer" class="qr-container"></div>
+    <input type="text" id="qrText" placeholder="Nhập mã, cách nhau bởi dấu cách hoặc dấu nháy đơn" style="width: 50%;">
+    <br>
+    <button onclick="generateQRCodes()">Tạo mã QR</button>
+    <button id="generateBarcode">Tạo mã vạch</button>
+
+    <div class="qr-container" id="qrContainer"></div>
+    <div class="barcode-container" id="barcodeContainer"></div>
 
     <script>
         function generateQRCodes() {
             const input = document.getElementById("qrText").value.trim();
-            const data = input.split(/\s+|'/); // phân cách bằng space hoặc dấu '
+            const data = input.split(/\s+|'/);
             const qrContainer = document.getElementById("qrContainer");
             qrContainer.innerHTML = "";
 
-            data.forEach((text, index) => {
+            data.forEach((text) => {
                 if (text.trim() === "") return;
 
                 const div = document.createElement("div");
@@ -111,6 +102,9 @@
                 div.className = "qr-box";
 
                 const svg = document.createElement("svg");
+                div.appendChild(svg);
+                barcodeContainer.appendChild(div);
+
                 JsBarcode(svg, value, {
                     format: "CODE128",
                     displayValue: true,
@@ -118,11 +112,9 @@
                     height: 100,
                     width: 2
                 });
-
-                div.appendChild(svg);
-                barcodeContainer.appendChild(div);
             });
         });
     </script>
+
 </body>
 </html>

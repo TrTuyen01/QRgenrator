@@ -2,65 +2,55 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>QR & Barcode Generator</title>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
       margin: 20px;
     }
-
-    .logo-container {
+    .header {
       display: flex;
       align-items: center;
-      justify-content: flex-start;
-      margin-bottom: 20px;
-    }
-
-    .logo-container img {
-      height: 60px;
-    }
-
-    .input-row {
-      display: flex;
-      justify-content: center;
       margin-bottom: 10px;
-      flex-wrap: wrap;
     }
-
-    .input-row input {
-      width: 60%;
-      padding: 10px;
-      font-size: 16px;
+    .header img {
+      height: 50px;
       margin-right: 10px;
     }
-
-    .input-row button {
-      padding: 10px 20px;
+    .header-text {
+      font-weight: bold;
+      color: red;
+      font-size: 18px;
+    }
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
       font-size: 16px;
     }
-
-    .button-row {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-      gap: 20px;
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
     }
-
     .qr-container {
       display: flex;
       flex-wrap: wrap;
-      justify-content: flex-start;
+      justify-content: center;
       gap: 20px;
+      margin-top: 20px;
     }
-
     .qr-box {
-      width: 180px;
       text-align: center;
     }
-
     .qr-box canvas, .qr-box svg {
       width: 150px;
       height: 150px;
@@ -68,75 +58,74 @@
   </style>
 </head>
 <body>
-  <div class="logo-container">
-    <img src="logo.png" alt="FPT Yên Khánh Logo" />
+
+  <!-- Header -->
+  <div class="header">
+    <img src="logo.png" alt="Logo FPT Yên Khánh" />
+    <div class="header-text">Mã Vạch Hỗ Trợ: TuyenTA4@fpt.com - 0977989605</div>
   </div>
 
-  <h2>QRgenerator</h2>
-
-  <div class="input-row">
-    <input type="text" id="textInput" placeholder="Nhập các nội dung cách nhau bằng dấu cách hoặc dấu nháy đơn" />
+  <!-- Form input -->
+  <div class="form-row">
+    <input type="text" id="text-input" placeholder="Nhập các nội dung cách nhau bằng dấu cách hoặc dấu nháy đơn" />
     <button onclick="generateQR()">Tạo mã QR</button>
   </div>
-
-  <div class="button-row">
-    <button onclick="generateBarcodes()">Tạo mã vạch</button>
+  <div class="form-row">
+    <button onclick="generateBarcode()">Tạo mã vạch</button>
   </div>
 
-  <div id="output" class="qr-container"></div>
+  <!-- Kết quả mã QR và mã vạch -->
+  <div id="qr-output" class="qr-container"></div>
 
   <script>
-    function splitInput(input) {
-      // Tách theo khoảng trắng hoặc dấu nháy đơn
-      return input.trim().split(/[\s']+/).filter(Boolean);
-    }
-
     function clearOutput() {
-      document.getElementById("output").innerHTML = "";
+      document.getElementById("qr-output").innerHTML = "";
     }
 
     function generateQR() {
       clearOutput();
-      const input = document.getElementById("textInput").value;
-      const texts = splitInput(input);
+      const text = document.getElementById("text-input").value.trim();
+      if (!text) return;
 
-      texts.forEach(text => {
-        const container = document.createElement("div");
-        container.className = "qr-box";
-        const canvas = document.createElement("canvas");
-        const caption = document.createElement("div");
-        caption.textContent = text;
-        container.appendChild(canvas);
-        container.appendChild(caption);
-        document.getElementById("output").appendChild(container);
-
-        QRCode.toCanvas(canvas, text, { width: 150, margin: 1 }, function (error) {
-          if (error) console.error(error);
+      const parts = text.includes("'") ? text.split("'") : text.split(" ");
+      parts.forEach((part) => {
+        const box = document.createElement("div");
+        box.className = "qr-box";
+        QRCode.toCanvas(document.createElement("canvas"), part, {
+          width: 150,  // tăng kích thước QR lên 50%
+          margin: 1,
+        }, function (err, canvas) {
+          if (err) console.error(err);
+          else {
+            box.appendChild(canvas);
+            const label = document.createElement("div");
+            label.textContent = part;
+            box.appendChild(label);
+            document.getElementById("qr-output").appendChild(box);
+          }
         });
       });
     }
 
-    function generateBarcodes() {
+    function generateBarcode() {
       clearOutput();
-      const input = document.getElementById("textInput").value;
-      const texts = splitInput(input);
+      const text = document.getElementById("text-input").value.trim();
+      if (!text) return;
 
-      texts.forEach(text => {
-        const container = document.createElement("div");
-        container.className = "qr-box";
+      const parts = text.includes("'") ? text.split("'") : text.split(" ");
+      parts.forEach((part) => {
+        const box = document.createElement("div");
+        box.className = "qr-box";
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        const caption = document.createElement("div");
-        caption.textContent = text;
-        container.appendChild(svg);
-        container.appendChild(caption);
-        document.getElementById("output").appendChild(container);
-
-        JsBarcode(svg, text, {
+        JsBarcode(svg, part, {
           format: "CODE128",
+          lineColor: "#000",
           width: 2,
-          height: 80,
-          displayValue: false
+          height: 100,
+          displayValue: true
         });
+        box.appendChild(svg);
+        document.getElementById("qr-output").appendChild(box);
       });
     }
   </script>

@@ -2,84 +2,141 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>QRgenerator</title>
+  <title>QR & Barcode Generator</title>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode/dist/JsBarcode.all.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
+      text-align: center;
+      margin: 20px;
     }
-    .header {
+
+    .logo-container {
       display: flex;
       align-items: center;
       justify-content: flex-start;
-      padding-bottom: 20px;
+      margin-bottom: 20px;
     }
-    .header img {
-      height: 50px;
+
+    .logo-container img {
+      height: 60px;
     }
-    input, button {
+
+    .input-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .input-row input {
+      width: 60%;
       padding: 10px;
-      margin: 10px 0;
-      width: 100%;
-      max-width: 600px;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+
+    .input-row button {
+      padding: 10px 20px;
       font-size: 16px;
     }
+
+    .button-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      gap: 20px;
+    }
+
     .qr-container {
       display: flex;
       flex-wrap: wrap;
+      justify-content: flex-start;
       gap: 20px;
-      max-width: 1220px;
-      margin-top: 30px;
     }
-    .qr-item {
-      width: 192px;
+
+    .qr-box {
+      width: 180px;
       text-align: center;
     }
-    canvas {
-      margin-bottom: 5px;
+
+    .qr-box canvas, .qr-box svg {
+      width: 150px;
+      height: 150px;
     }
   </style>
 </head>
 <body>
-  <div class="header">
+  <div class="logo-container">
     <img src="logo.png" alt="FPT Yên Khánh Logo" />
   </div>
 
   <h2>QRgenerator</h2>
-  <input type="text" id="text" placeholder="Nhập các nội dung cách nhau bằng dấu cách hoặc dấu nháy đơn" />
-  <button onclick="generateQR()">Tạo mã QR</button>
 
-  <div class="qr-container" id="qrcode"></div>
+  <div class="input-row">
+    <input type="text" id="textInput" placeholder="Nhập các nội dung cách nhau bằng dấu cách hoặc dấu nháy đơn" />
+    <button onclick="generateQR()">Tạo mã QR</button>
+  </div>
+
+  <div class="button-row">
+    <button onclick="generateBarcodes()">Tạo mã vạch</button>
+  </div>
+
+  <div id="output" class="qr-container"></div>
 
   <script>
+    function splitInput(input) {
+      // Tách theo khoảng trắng hoặc dấu nháy đơn
+      return input.trim().split(/[\s']+/).filter(Boolean);
+    }
+
+    function clearOutput() {
+      document.getElementById("output").innerHTML = "";
+    }
+
     function generateQR() {
-      const input = document.getElementById('text').value.trim();
-      const container = document.getElementById('qrcode');
-      container.innerHTML = ''; // Xóa QR cũ
+      clearOutput();
+      const input = document.getElementById("textInput").value;
+      const texts = splitInput(input);
 
-      if (!input) return;
+      texts.forEach(text => {
+        const container = document.createElement("div");
+        container.className = "qr-box";
+        const canvas = document.createElement("canvas");
+        const caption = document.createElement("div");
+        caption.textContent = text;
+        container.appendChild(canvas);
+        container.appendChild(caption);
+        document.getElementById("output").appendChild(container);
 
-      const parts = input.split(/[\s']+/); // Tách theo space hoặc dấu nháy đơn
+        QRCode.toCanvas(canvas, text, { width: 150, margin: 1 }, function (error) {
+          if (error) console.error(error);
+        });
+      });
+    }
 
-      parts.forEach((text) => {
-        if (text.trim()) {
-          const div = document.createElement('div');
-          div.className = 'qr-item';
+    function generateBarcodes() {
+      clearOutput();
+      const input = document.getElementById("textInput").value;
+      const texts = splitInput(input);
 
-          const canvas = document.createElement('canvas');
-          QRCode.toCanvas(canvas, text, { width: 192 }, function (error) {
-            if (error) console.error(error);
-          });
+      texts.forEach(text => {
+        const container = document.createElement("div");
+        container.className = "qr-box";
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        const caption = document.createElement("div");
+        caption.textContent = text;
+        container.appendChild(svg);
+        container.appendChild(caption);
+        document.getElementById("output").appendChild(container);
 
-          const label = document.createElement('div');
-          label.textContent = text;
-
-          div.appendChild(canvas);
-          div.appendChild(label);
-          container.appendChild(div);
-        }
+        JsBarcode(svg, text, {
+          format: "CODE128",
+          width: 2,
+          height: 80,
+          displayValue: false
+        });
       });
     }
   </script>

@@ -7,10 +7,27 @@
   <style>
     body {
       font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+    }
+    .header img {
+      height: 40px;
+      margin-right: 10px;
+    }
+    .header span {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .content {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-top: 50px;
+      margin-top: 30px;
     }
     input, button {
       padding: 10px;
@@ -18,20 +35,37 @@
       width: 300px;
       font-size: 16px;
     }
+    .qr-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      max-width: 1200px;
+      margin: 30px auto;
+    }
     .qr-item {
-      margin-top: 20px;
+      width: 120px;
       text-align: center;
     }
-    canvas {
+    .qr-item canvas {
+      width: 100px;
+      height: 100px;
       margin-bottom: 5px;
     }
   </style>
 </head>
 <body>
-  <h2>QRgenerator</h2>
-  <input type="text" id="text" placeholder="Nhập nhiều nội dung cách nhau bằng space hoặc dấu ' " />
-  <button onclick="generateQRs()">Tạo mã QR</button>
-  <div id="qrcode"></div>
+  <div class="header">
+    <img src="logo.png" alt="FPT Logo">
+  </div>
+
+  <div class="content">
+    <h2>Tạo mã QR</h2>
+    <input type="text" id="text" placeholder="Nhập nhiều nội dung cách nhau bằng space hoặc dấu ' " />
+    <button onclick="generateQRs()">Tạo mã QR</button>
+  </div>
+
+  <div class="qr-grid" id="qrcode"></div>
 
   <script>
     function generateQRs() {
@@ -39,7 +73,6 @@
       const container = document.getElementById('qrcode');
       container.innerHTML = "";
 
-      // Tách các text theo khoảng trắng hoặc dấu '
       const parts = input.split(/[\s']+/).filter(item => item.trim() !== "");
 
       parts.forEach(text => {
@@ -49,7 +82,7 @@
         QRCode.toCanvas(document.createElement('canvas'), text, function (err, canvas) {
           if (err) console.error(err);
           const label = document.createElement('div');
-          label.textContent = `Nội dung: ${text}`;
+          label.textContent = text;
           wrapper.appendChild(canvas);
           wrapper.appendChild(label);
           container.appendChild(wrapper);

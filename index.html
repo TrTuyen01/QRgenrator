@@ -1,137 +1,128 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QR & Barcode Generator</title>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      text-align: center;
-    }
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      margin-bottom: 10px;
-    }
-    .header img {
-      height: 60px;
-      margin-bottom: 5px;
-    }
-    .header-text {
-      font-weight: bold;
-      color: red;
-      font-size: 18px;
-    }
-    .form-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-    input[type="text"] {
-      width: 400px;
-      padding: 10px;
-      font-size: 16px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-.qr-container {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr); /* Mỗi hàng 6 mã */
-  gap: 30px 40px; /* Tăng khoảng cách giữa các ô mã */
-  justify-items: center;
-  margin-top: 30px;
-}
-.qr-box {
-  text-align: center;
-}
-.qr-box canvas, .qr-box svg {
-  width: 150px;
-  height: 150px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>QR & Barcode Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 30px;
+        }
+        .logo {
+            width: 320px;
+            margin: 0 auto 10px;
+        }
+        .support {
+            font-size: 18px;
+            color: red;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        #qrText {
+            width: 60%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .qr-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px 40px;
+            margin-top: 30px;
+        }
+        .qr-box {
+            text-align: center;
+            width: 160px;
+        }
+        .qr-box svg, .qr-box canvas {
+            display: block;
+            margin: 0 auto;
+        }
+        .qr-box p {
+            margin-top: 8px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
+    <img src="logo.png" alt="Yên Khánh Logo" class="logo">
+    <div class="support">Mã Vạch Hỗ Trợ: TuyenTA4@fpt.com - 0977989605</div>
 
-  <!-- Header -->
-  <div class="header">
-    <img src="logo.png" alt="Logo FPT Yên Khánh" />
-    <div class="header-text">Mã Vạch Hỗ Trợ: TuyenTA4@fpt.com - 0977989605</div>
-  </div>
+    <div class="input-group">
+        <input type="text" id="qrText" placeholder="'00800489 00906251 00910057'" />
+        <button onclick="generateQRCodes()">Tạo mã QR</button>
+        <button id="generateBarcode">Tạo mã vạch</button>
+    </div>
 
-  <!-- Form input -->
-  <div class="form-row">
-    <input type="text" id="text-input" placeholder="Nhập các nội dung cách nhau bằng dấu cách hoặc dấu nháy đơn" />
-    <button onclick="generateQR()">Tạo mã QR</button>
-  </div>
-  <div class="form-row">
-    <button onclick="generateBarcode()">Tạo mã vạch</button>
-  </div>
+    <div id="qrContainer" class="qr-container"></div>
+    <div id="barcodeContainer" class="qr-container"></div>
 
-  <!-- Kết quả mã QR và mã vạch -->
-  <div id="qr-output" class="qr-container"></div>
+    <script>
+        function generateQRCodes() {
+            const input = document.getElementById("qrText").value.trim();
+            const data = input.split(/\s+|'/); // phân cách bằng space hoặc dấu '
+            const qrContainer = document.getElementById("qrContainer");
+            qrContainer.innerHTML = "";
 
-  <script>
-    function clearOutput() {
-      document.getElementById("qr-output").innerHTML = "";
-    }
+            data.forEach((text, index) => {
+                if (text.trim() === "") return;
 
-    function generateQR() {
-      clearOutput();
-      const text = document.getElementById("text-input").value.trim();
-      if (!text) return;
+                const div = document.createElement("div");
+                div.className = "qr-box";
 
-      const parts = text.includes("'") ? text.split("'") : text.split(" ");
-      parts.forEach((part) => {
-        const box = document.createElement("div");
-        box.className = "qr-box";
-        QRCode.toCanvas(document.createElement("canvas"), part, {
-          width: 150,
-          margin: 1,
-        }, function (err, canvas) {
-          if (err) console.error(err);
-          else {
-            box.appendChild(canvas);
-            const label = document.createElement("div");
-            label.textContent = part;
-            box.appendChild(label);
-            document.getElementById("qr-output").appendChild(box);
-          }
+                const qr = document.createElement("div");
+                new QRCode(qr, {
+                    text: text,
+                    width: 150,
+                    height: 150
+                });
+
+                const label = document.createElement("p");
+                label.textContent = text;
+
+                div.appendChild(qr);
+                div.appendChild(label);
+                qrContainer.appendChild(div);
+            });
+        }
+
+        document.getElementById("generateBarcode").addEventListener("click", function () {
+            const input = document.getElementById("qrText").value.trim();
+            const data = input.split(/\s+|'/);
+            const barcodeContainer = document.getElementById("barcodeContainer");
+            barcodeContainer.innerHTML = "";
+
+            data.forEach(value => {
+                if (value.trim() === "") return;
+
+                const div = document.createElement("div");
+                div.className = "qr-box";
+
+                const svg = document.createElement("svg");
+                JsBarcode(svg, value, {
+                    format: "CODE128",
+                    displayValue: true,
+                    fontSize: 16,
+                    height: 100,
+                    width: 2
+                });
+
+                div.appendChild(svg);
+                barcodeContainer.appendChild(div);
+            });
         });
-      });
-    }
-
-    function generateBarcode() {
-      clearOutput();
-      const text = document.getElementById("text-input").value.trim();
-      if (!text) return;
-
-      const parts = text.includes("'") ? text.split("'") : text.split(" ");
-      parts.forEach((part) => {
-        const box = document.createElement("div");
-        box.className = "qr-box";
-        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        JsBarcode(svg, part, {
-          format: "CODE128",
-          lineColor: "#000",
-          width: 2,
-          height: 100,
-          displayValue: true
-        });
-        box.appendChild(svg);
-        document.getElementById("qr-output").appendChild(box);
-      });
-    }
-  </script>
+    </script>
 </body>
 </html>

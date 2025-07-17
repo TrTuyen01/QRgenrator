@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>QRgenerator</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      width: 300px;
+      font-size: 16px;
+    }
+    canvas {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>QRgenerator</h2>
+  <input type="text" id="text" placeholder="Nhập nội dung cần tạo mã QR" />
+  <button onclick="generateQR()">Tạo mã QR</button>
+  <div id="qrcode"></div>
+
+  <script>
+    function generateQR() {
+      const text = document.getElementById('text').value;
+      const container = document.getElementById('qrcode');
+      container.innerHTML = ""; // Xóa QR cũ
+      if (text.trim() !== "") {
+        QRCode.toCanvas(document.createElement('canvas'), text, function (err, canvas) {
+          if (err) console.error(err);
+          container.appendChild(canvas);
+        });
+      }
+    }
+  </script>
+</body>
+</html>

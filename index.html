@@ -2,10 +2,9 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>QR Generator & PDF to Word</title>
+  <title>QR Generator & Barcode Generator</title>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.7.0/docx.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -48,47 +47,22 @@
       margin: 5px 0 0 0;
       font-size: 14px;
     }
-    #tab-word, #tab-qr {
-      display: none;
-    }
-    #drop-zone {
-      border: 2px dashed #ccc;
-      padding: 30px;
-      text-align: center;
-    }
   </style>
 </head>
 <body>
 
-  <button onclick="switchTab('qr')">Tạo Mã QR</button>
-  <button onclick="switchTab('word')">Chuyển PDF sang Word</button>
+  <img src="your-logo.png" class="logo" alt="Logo Yên Khánh">
+  <h2>Mã Vạch Hỗ Trợ: TuyenTA4@fpt.com - 0977989605</h2>
 
-  <div id="tab-qr">
-    <img src="your-logo.png" class="logo" alt="Logo Yên Khánh">
-    <h2>Mã Vạch Hỗ Trợ: TuyenTA4@fpt.com - 0977989605</h2>
-    <input type="text" id="qrText" placeholder="Nhập mã, cách nhau bởi dấu cách hoặc dấu nháy đơn" style="width: 50%;">
-    <br>
-    <button onclick="generateQRCodes()">Tạo mã QR</button>
-    <button onclick="clearText()">Xóa Text</button>
-    <div class="qr-container" id="qrContainer"></div>
-  </div>
+  <input type="text" id="qrText" placeholder="Nhập mã, cách nhau bởi dấu cách hoặc dấu nháy đơn" style="width: 50%;">
+  <br>
+  <button onclick="generateQRCodes()">Tạo mã QR</button>
+  <button onclick="generateBarcodes()">Tạo mã Vạch</button>
+  <button onclick="clearText()">Xóa Text</button>
 
-  <div id="tab-word">
-    <h2>Chuyển PDF sang Word (.docx)</h2>
-    <div id="drop-zone">
-      <p>Kéo và thả file PDF vào đây hoặc nhấn để chọn</p>
-      <input type="file" id="file-input" accept="application/pdf" style="display:none;" />
-    </div>
-    <button id="downloadWordBtn" style="display:none; margin-top: 20px;">Tải về Word</button>
-  </div>
+  <div class="qr-container" id="qrContainer"></div>
 
   <script>
-    function switchTab(tab) {
-      document.getElementById('tab-qr').style.display = (tab === 'qr') ? 'block' : 'none';
-      document.getElementById('tab-word').style.display = (tab === 'word') ? 'block' : 'none';
-    }
-    switchTab('qr'); // Hiển thị QR mặc định
-
     function generateQRCodes() {
       const input = document.getElementById("qrText").value.trim();
       const data = input.split(/\s+|'/);
@@ -117,85 +91,39 @@
       });
     }
 
+    function generateBarcodes() {
+      const input = document.getElementById("qrText").value.trim();
+      const data = input.split(/\s+|'/);
+      const qrContainer = document.getElementById("qrContainer");
+      qrContainer.innerHTML = "";
+
+      data.forEach((text) => {
+        if (text.trim() === "") return;
+
+        const div = document.createElement("div");
+        div.className = "qr-box";
+
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        JsBarcode(svg, text, {
+          format: "CODE128",
+          width: 2,
+          height: 80,
+          displayValue: true
+        });
+
+        const label = document.createElement("p");
+        label.textContent = text;
+
+        div.appendChild(svg);
+        div.appendChild(label);
+        qrContainer.appendChild(div);
+      });
+    }
+
     function clearText() {
       document.getElementById("qrText").value = "";
       document.getElementById("qrContainer").innerHTML = "";
     }
-
-    // PDF to Word conversion
-    const dropZone = document.getElementById('drop-zone');
-    const fileInput = document.getElementById('file-input');
-    const downloadBtn = document.getElementById('downloadWordBtn');
-    let extractedText = '';
-
-    dropZone.addEventListener('click', () => fileInput.click());
-    dropZone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropZone.style.borderColor = '#007bff';
-    });
-    dropZone.addEventListener('dragleave', () => {
-      dropZone.style.borderColor = '#ccc';
-    });
-    dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropZone.style.borderColor = '#ccc';
-      const file = e.dataTransfer.files[0];
-      if (file && file.type === 'application/pdf') handlePDF(file);
-    });
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file && file.type === 'application/pdf') handlePDF(file);
-    });
-
-    async function handlePDF(file) {
-      const reader = new FileReader();
-      reader.onload = async function () {
-        const typedarray = new Uint8Array(this.result);
-        const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
-        extractedText = '';
-
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const content = await page.getTextContent();
-          const text = content.items.map(item => item.str).join(' ');
-          extractedText += text + '\n\n';
-        }
-
-        alert("\u0110\u00e3 \\u0111\u1ecdc xong file PDF. B\u1ea1n c\u00f3 th\u1ec3 t\u1ea3i v\u1ec1 d\u01b0\u1edbi d\u1ea1ng Word.");
-        downloadBtn.style.display = 'inline-block';
-      };
-      reader.readAsArrayBuffer(file);
-    }
-
-downloadBtn.addEventListener('click', async () => {
-  if (!extractedText || extractedText.trim() === '') {
-    alert("Không có nội dung để tạo file Word.");
-    return;
-  }
-
-  const { Document, Packer, Paragraph } = docx;
-
-  const doc = new Document({
-    sections: [{
-      properties: {},
-      children: extractedText.split('\n').map(line =>
-        new Paragraph({ text: line })
-      )
-    }]
-  });
-
-  const blob = await Packer.toBlob(doc);
-  const blobUrl = URL.createObjectURL(blob);
-
-  const a = document.createElement('a');
-  a.href = blobUrl;
-  a.download = "file_chuyen_doi.docx";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(blobUrl);
-});
-
   </script>
 </body>
 </html>

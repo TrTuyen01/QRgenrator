@@ -167,24 +167,35 @@
       reader.readAsArrayBuffer(file);
     }
 
-    downloadBtn.addEventListener('click', async () => {
-      if (!extractedText || extractedText.trim() === '') {
-        alert("Kh\u00f4ng c\u00f3 n\u1ed9i dung \u0111\u1ec3 t\u1ea1o file Word.");
-        return;
-      }
-      const doc = new docx.Document({
-        sections: [{
-          children: extractedText.split('\n').map(line => new docx.Paragraph(line))
-        }]
-      });
-      const blob = await docx.Packer.toBlob(doc);
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "chuyen_doi_tu_PDF.docx";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    });
+downloadBtn.addEventListener('click', async () => {
+  if (!extractedText || extractedText.trim() === '') {
+    alert("Không có nội dung để tạo file Word.");
+    return;
+  }
+
+  const { Document, Packer, Paragraph } = docx;
+
+  const doc = new Document({
+    sections: [{
+      properties: {},
+      children: extractedText.split('\n').map(line =>
+        new Paragraph({ text: line })
+      )
+    }]
+  });
+
+  const blob = await Packer.toBlob(doc);
+  const blobUrl = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = "file_chuyen_doi.docx";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(blobUrl);
+});
+
   </script>
 </body>
 </html>

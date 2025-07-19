@@ -30,20 +30,32 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 200px; /* tăng khoảng cách giữa các mã */
+      gap: 45px;
       margin-top: 20px;
     }
     .qr-box {
       text-align: center;
-      width: 300px; /* đủ rộng để chỉ hiển thị 3 mã mỗi hàng */
-      margin-bottom: 20px;
-      padding: 10px;
+      width: calc(20% - 45px);
+      min-width: 150px;
+      margin-bottom: 30px;
       border-right: 1px dashed #ccc;
+      padding-right: 22.5px;
     }
-    .qr-container .qr-box:nth-child(3n) {
+    .qr-box:nth-child(5n) {
       border-right: none;
     }
-    .qr-box svg, .qr-box canvas {
+    .barcode-row {
+      display: block;
+      justify-content: center;
+      margin-top: 30px;
+      border-top: 1px dashed #ccc;
+      padding-top: 20px;
+    }
+    .barcode-box {
+      text-align: center;
+      margin: 0 auto 30px auto;
+    }
+    .qr-box svg, .qr-box canvas, .barcode-box svg {
       display: block;
       margin: 0 auto;
     }
@@ -66,13 +78,16 @@
   <button onclick="clearText()">Xóa Text</button>
 
   <div class="qr-container" id="qrContainer"></div>
+  <div class="barcode-container" id="barcodeContainer"></div>
 
   <script>
     function generateQRCodes() {
       const input = document.getElementById("qrText").value.trim();
       const data = input.split(/\s+|'/);
       const qrContainer = document.getElementById("qrContainer");
+      const barcodeContainer = document.getElementById("barcodeContainer");
       qrContainer.innerHTML = "";
+      barcodeContainer.innerHTML = "";
 
       data.forEach((text, index) => {
         if (text.trim() === "") return;
@@ -100,13 +115,18 @@
       const input = document.getElementById("qrText").value.trim();
       const data = input.split(/\s+|'/);
       const qrContainer = document.getElementById("qrContainer");
+      const barcodeContainer = document.getElementById("barcodeContainer");
       qrContainer.innerHTML = "";
+      barcodeContainer.innerHTML = "";
 
-      data.forEach((text, index) => {
+      data.forEach((text) => {
         if (text.trim() === "") return;
 
+        const row = document.createElement("div");
+        row.className = "barcode-row";
+
         const div = document.createElement("div");
-        div.className = "qr-box";
+        div.className = "barcode-box";
 
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         JsBarcode(svg, text, {
@@ -121,13 +141,15 @@
 
         div.appendChild(svg);
         div.appendChild(label);
-        qrContainer.appendChild(div);
+        row.appendChild(div);
+        barcodeContainer.appendChild(row);
       });
     }
 
     function clearText() {
       document.getElementById("qrText").value = "";
       document.getElementById("qrContainer").innerHTML = "";
+      document.getElementById("barcodeContainer").innerHTML = "";
     }
   </script>
 </body>

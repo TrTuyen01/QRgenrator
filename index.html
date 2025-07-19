@@ -64,12 +64,45 @@
       font-size: 14px;
       text-align: center;
     }
+    /* Pacman animation */
+    .pacman-container {
+      width: 100%;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .pacman {
+      width: 40px;
+      height: 40px;
+      background: yellow;
+      border-radius: 50%;
+      position: relative;
+      animation: movePacman 4s linear infinite;
+      margin: 0 auto;
+      clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+    }
+    @keyframes movePacman {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100vw); }
+    }
   </style>
 </head>
 <body>
 
+  <script>
+    // Thay đổi màu nền ngẫu nhiên trong 7 màu cầu vồng
+    const rainbowColors = ["#FF0000", "#FF7F00", "#FFFF00", "#00FF00", "#0000FF", "#4B0082", "#8F00FF"];
+    document.addEventListener("DOMContentLoaded", () => {
+      const randomColor = rainbowColors[Math.floor(Math.random() * rainbowColors.length)];
+      document.querySelector('.pacman').style.backgroundColor = randomColor;
+    });
+  </script>
+
+  <div class="pacman-container">
+    <div class="pacman"></div>
+  </div>
+
   <img src="your-logo.png" class="logo" alt="Logo Yên Khánh">
-  <h2>Mã Vạch Hỗ Trợ: TuyenTA4 - 0977989605</h2>
+  <h2>Mã Vạch Hỗ Trợ: TuyenTA4@fpt.com - 0977989605</h2>
 
   <input type="text" id="qrText" placeholder="Nhập mã, cách nhau bởi dấu cách hoặc dấu nháy đơn" style="width: 50%;">
   <br>

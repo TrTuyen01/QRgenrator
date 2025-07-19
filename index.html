@@ -64,42 +64,89 @@
       font-size: 14px;
       text-align: center;
     }
-    /* Pacman animation */
-    .pacman-container {
-      width: 100%;
-      overflow: hidden;
-      margin-bottom: 10px;
-    }
-    .pacman {
-      width: 40px;
-      height: 40px;
-      background: yellow;
-      border-radius: 50%;
+    /* Cars animation */
+    .collision-container {
       position: relative;
-      animation: movePacman 4s linear infinite;
-      margin: 0 auto;
-      clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+      width: 100%;
+      height: 60px;
+      margin-bottom: 20px;
+      overflow: hidden;
     }
-    @keyframes movePacman {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100vw); }
+    .car {
+      width: 50px;
+      height: 30px;
+      position: absolute;
+      top: 15px;
+      border-radius: 5px;
+    }
+    .car.left {
+      left: -60px;
+      animation: moveLeftCar 6s linear forwards;
+    }
+    .car.right {
+      right: -60px;
+      animation: moveRightCar 6s linear forwards;
+    }
+    @keyframes moveLeftCar {
+      to { left: 50%; }
+    }
+    @keyframes moveRightCar {
+      to { right: 50%; }
+    }
+    .explosion {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, orange, red);
+      border-radius: 50%;
+      display: none;
+      animation: explode 1s ease-out forwards;
+    }
+    @keyframes explode {
+      0% { transform: scale(0.5) translate(-50%, -50%); opacity: 1; }
+      100% { transform: scale(1.2) translate(-50%, -50%); opacity: 0; }
+    }
+    .fpt-label {
+      display: none;
+      font-size: 24px;
+      font-weight: bold;
+      color: red;
+      animation: fadeIn 1s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   </style>
 </head>
 <body>
 
   <script>
-    // Thay đổi màu nền ngẫu nhiên trong 7 màu cầu vồng
-    const rainbowColors = ["#FF0000", "#FF7F00", "#FFFF00", "#00FF00", "#0000FF", "#4B0082", "#8F00FF"];
+    const red = "#FF0000";
+    const black = "#000000";
+    const isRedLeft = Math.random() < 0.5;
+    const leftColor = isRedLeft ? red : black;
+    const rightColor = isRedLeft ? black : red;
+
     document.addEventListener("DOMContentLoaded", () => {
-      const randomColor = rainbowColors[Math.floor(Math.random() * rainbowColors.length)];
-      document.querySelector('.pacman').style.backgroundColor = randomColor;
+      const explosion = document.querySelector('.explosion');
+      const label = document.querySelector('.fpt-label');
+      setTimeout(() => {
+        explosion.style.display = 'block';
+        label.style.display = 'block';
+      }, 3000);
     });
   </script>
 
-  <div class="pacman-container">
-    <div class="pacman"></div>
+  <div class="collision-container">
+    <div class="car left" style="background: ${leftColor};"></div>
+    <div class="car right" style="background: ${rightColor};"></div>
+    <div class="explosion"></div>
   </div>
+  <div class="fpt-label">FPTSHOP YÊN KHÁNH</div>
 
   <img src="your-logo.png" class="logo" alt="Logo Yên Khánh">
   <h2>Mã Vạch Hỗ Trợ: TuyenTA4@fpt.com - 0977989605</h2>

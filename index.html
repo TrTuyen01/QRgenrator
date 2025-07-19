@@ -1,190 +1,190 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <title>QR Generator</title>
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-            background: #fff;
-        }
-        img.logo {
-            max-width: 300px;
-            margin-bottom: 5px;
-        }
-        h2 {
-            color: red;
-            margin-top: 0;
-            font-size: 18px;
-        }
-        input, button {
-            padding: 8px;
-            margin: 5px;
-            font-size: 16px;
-        }
-        .qr-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 25px;
-            margin-top: 20px;
-        }
-        .qr-box {
-    text-align: center;
-    width: 15%;
-    min-width: 150px;
-    margin-bottom: 20px;
-        }
-        .qr-box svg, .qr-box canvas {
-            display: block;
-            margin: 0 auto;
-        }
-        p {
-            margin: 5px 0 0 0;
-            font-size: 14px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>QR Generator & PDF to Word</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.7.0/docx.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background: #fff;
+    }
+    img.logo {
+      max-width: 300px;
+      margin-bottom: 5px;
+    }
+    h2 {
+      color: red;
+      margin-top: 0;
+      font-size: 18px;
+    }
+    input, button {
+      padding: 8px;
+      margin: 5px;
+      font-size: 16px;
+    }
+    .qr-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 25px;
+      margin-top: 20px;
+    }
+    .qr-box {
+      text-align: center;
+      width: 15%;
+      min-width: 150px;
+      margin-bottom: 20px;
+    }
+    .qr-box svg, .qr-box canvas {
+      display: block;
+      margin: 0 auto;
+    }
+    p {
+      margin: 5px 0 0 0;
+      font-size: 14px;
+    }
+    #tab-word, #tab-qr {
+      display: none;
+    }
+    #drop-zone {
+      border: 2px dashed #ccc;
+      padding: 30px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
 
+  <button onclick="switchTab('qr')">Tạo Mã QR</button>
+  <button onclick="switchTab('word')">Chuyển PDF sang Word</button>
+
+  <div id="tab-qr">
     <img src="your-logo.png" class="logo" alt="Logo Yên Khánh">
     <h2>Mã Vạch Hỗ Trợ: TuyenTA4@fpt.com - 0977989605</h2>
-
     <input type="text" id="qrText" placeholder="Nhập mã, cách nhau bởi dấu cách hoặc dấu nháy đơn" style="width: 50%;">
     <br>
     <button onclick="generateQRCodes()">Tạo mã QR</button>
     <button onclick="clearText()">Xóa Text</button>
-
     <div class="qr-container" id="qrContainer"></div>
-
-    <script>
-        function generateQRCodes() {
-            const input = document.getElementById("qrText").value.trim();
-            const data = input.split(/\s+|'/);
-            const qrContainer = document.getElementById("qrContainer");
-            qrContainer.innerHTML = "";
-
-            data.forEach((text) => {
-                if (text.trim() === "") return;
-
-                const div = document.createElement("div");
-                div.className = "qr-box";
-
-                const qr = document.createElement("div");
-                new QRCode(qr, {
-                    text: text,
-                    width: 150,
-                    height: 150
-                });
-
-                const label = document.createElement("p");
-                label.textContent = text;
-
-                div.appendChild(qr);
-                div.appendChild(label);
-                qrContainer.appendChild(div);
-            });
-        }
-
-        function clearText() {
-            document.getElementById("qrText").value = "";
-            document.getElementById("qrContainer").innerHTML = "";
-        }
-    </script>
-
-</body>
-</html>
-<!-- Tab mới: Chuyển PDF sang Word -->
-<div id="tab-word" style="display:none;">
-  <h2>Chuyển PDF sang Word (.docx)</h2>
-
-  <div id="drop-zone" style="border: 2px dashed #ccc; padding: 30px; text-align: center;">
-    <p>Kéo và thả file PDF vào đây hoặc nhấn để chọn</p>
-    <input type="file" id="file-input" accept="application/pdf" style="display:none;" />
   </div>
 
-  <button id="downloadWordBtn" style="display:none; margin-top: 20px;">Tải về Word</button>
-</div>
+  <div id="tab-word">
+    <h2>Chuyển PDF sang Word (.docx)</h2>
+    <div id="drop-zone">
+      <p>Kéo và thả file PDF vào đây hoặc nhấn để chọn</p>
+      <input type="file" id="file-input" accept="application/pdf" style="display:none;" />
+    </div>
+    <button id="downloadWordBtn" style="display:none; margin-top: 20px;">Tải về Word</button>
+  </div>
 
-<!-- Nút chuyển tab -->
-<button onclick="switchTab('qr')">Tạo Mã QR</button>
-<button onclick="switchTab('word')">Chuyển PDF sang Word</button>
+  <script>
+    function switchTab(tab) {
+      document.getElementById('tab-qr').style.display = (tab === 'qr') ? 'block' : 'none';
+      document.getElementById('tab-word').style.display = (tab === 'word') ? 'block' : 'none';
+    }
+    switchTab('qr'); // Hiển thị QR mặc định
 
-<!-- Thư viện cần dùng -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.7.0/docx.min.js"></script>
+    function generateQRCodes() {
+      const input = document.getElementById("qrText").value.trim();
+      const data = input.split(/\s+|'/);
+      const qrContainer = document.getElementById("qrContainer");
+      qrContainer.innerHTML = "";
 
-<script>
-  // TAB CHUYỂN ĐỔI PDF
-  const dropZone = document.getElementById('drop-zone');
-  const fileInput = document.getElementById('file-input');
-  const downloadBtn = document.getElementById('downloadWordBtn');
-  let extractedText = '';
+      data.forEach((text) => {
+        if (text.trim() === "") return;
 
-  // Kéo & Thả
-  dropZone.addEventListener('click', () => fileInput.click());
-  dropZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropZone.style.borderColor = '#007bff';
-  });
-  dropZone.addEventListener('dragleave', () => {
-    dropZone.style.borderColor = '#ccc';
-  });
-  dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropZone.style.borderColor = '#ccc';
-    const file = e.dataTransfer.files[0];
-    if (file && file.type === 'application/pdf') handlePDF(file);
-  });
-  fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file && file.type === 'application/pdf') handlePDF(file);
-  });
+        const div = document.createElement("div");
+        div.className = "qr-box";
 
-  async function handlePDF(file) {
-    const reader = new FileReader();
-    reader.onload = async function () {
-      const typedarray = new Uint8Array(this.result);
-      const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
-      extractedText = '';
+        const qr = document.createElement("div");
+        new QRCode(qr, {
+          text: text,
+          width: 150,
+          height: 150
+        });
 
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        const text = content.items.map(item => item.str).join(' ');
-        extractedText += text + '\n\n';
-      }
+        const label = document.createElement("p");
+        label.textContent = text;
 
-      alert("Đã đọc xong file PDF. Bạn có thể tải về dưới dạng Word.");
-      downloadBtn.style.display = 'inline-block';
-    };
-    reader.readAsArrayBuffer(file);
-  }
+        div.appendChild(qr);
+        div.appendChild(label);
+        qrContainer.appendChild(div);
+      });
+    }
 
-  // Tạo file Word
-  downloadBtn.addEventListener('click', async () => {
-    const doc = new docx.Document({
-      sections: [{
-        children: [
-          new docx.Paragraph(extractedText)
-        ]
-      }]
+    function clearText() {
+      document.getElementById("qrText").value = "";
+      document.getElementById("qrContainer").innerHTML = "";
+    }
+
+    // PDF to Word conversion
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const downloadBtn = document.getElementById('downloadWordBtn');
+    let extractedText = '';
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#007bff';
+    });
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.style.borderColor = '#ccc';
+    });
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#ccc';
+      const file = e.dataTransfer.files[0];
+      if (file && file.type === 'application/pdf') handlePDF(file);
+    });
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.type === 'application/pdf') handlePDF(file);
     });
 
-    const blob = await docx.Packer.toBlob(doc);
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "chuyen_doi_tu_PDF.docx";
-    link.click();
-  });
+    async function handlePDF(file) {
+      const reader = new FileReader();
+      reader.onload = async function () {
+        const typedarray = new Uint8Array(this.result);
+        const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
+        extractedText = '';
 
-  // TAB Switching
-  function switchTab(tab) {
-    document.getElementById('tab-word').style.display = (tab === 'word') ? 'block' : 'none';
-    // Ẩn tab QR nếu có
-    if (document.getElementById('tab-qr')) document.getElementById('tab-qr').style.display = (tab === 'qr') ? 'block' : 'none';
-  }
-</script>
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          const text = content.items.map(item => item.str).join(' ');
+          extractedText += text + '\n\n';
+        }
+
+        alert("\u0110\u00e3 \\u0111\u1ecdc xong file PDF. B\u1ea1n c\u00f3 th\u1ec3 t\u1ea3i v\u1ec1 d\u01b0\u1edbi d\u1ea1ng Word.");
+        downloadBtn.style.display = 'inline-block';
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    downloadBtn.addEventListener('click', async () => {
+      if (!extractedText || extractedText.trim() === '') {
+        alert("Kh\u00f4ng c\u00f3 n\u1ed9i dung \u0111\u1ec3 t\u1ea1o file Word.");
+        return;
+      }
+      const doc = new docx.Document({
+        sections: [{
+          children: extractedText.split('\n').map(line => new docx.Paragraph(line))
+        }]
+      });
+      const blob = await docx.Packer.toBlob(doc);
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "chuyen_doi_tu_PDF.docx";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+  </script>
+</body>
+</html>

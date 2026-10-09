@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Generator & Barcode Generator</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background: #fff;
+    }
+    img.logo {
+      max-width: 300px;
+      margin-bottom: 5px;
+    }
+    h2 {
+      color: red;
+      margin-top: 0;
+      font-size: 18px;
+    }
+    input, button {
+      padding: 8px;
+      margin: 5px;
+      font-size: 16px;
+    }
+    .qr-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 45px;
+      margin-top: 20px;
+    }
+    .qr-box {
+      text-align: center;
+      width: calc(20% - 45px);
+      min-width: 150px;
+      margin-bottom: 30px;
+      border-right: 1px dashed #ccc;
+      padding-right: 22.5px;
+    }
+    .qr-box:nth-child(5n) {
+      border-right: none;
+    }
+    .barcode-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 30px;
+      border-top: 1px dashed #ccc;
+      padding-top: 20px;
+    }
+    .barcode-box {
+      text-align: center;
+      margin: 0 auto 30px auto;
+    }
+    .qr-box svg, .qr-box canvas, .barcode-box svg {
+      display: block;
+      margin: 0 auto;
+    }
+    p {
+      margin: 5px 0 0 0;
+      font-size: 14px;
+      text-align: center;
+    }
+    /* Cars animation */
+    .collision-container {
+      position: relative;
+      width: 100%;
+      height: 60px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .car {
+      width: 50px;
+      height: 30px;
+      position: absolute;
+      top: 15px;
+      border-radius: 5px;
+    }
+    .car.left {
+      left: -60px;
+      animation: moveLeftCar 6s linear forwards;
+    }
+    .car.right {
+      right: -60px;
+      animation: moveRightCar 6s linear forwards;
+    }
+    @keyframes moveLeftCar {
+      to { left: 50%; }
+    }
+    @keyframes moveRightCar {
+      to { right: 50%; }
+    }
+    .explosion {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, orange, red);
+      border-radius: 50%;
+      display: none;
+      animation: explode 1s ease-out forwards;
+    }
+    @keyframes explode {
+      0% { transform: scale(0.5) translate(-50%, -50%); opacity: 1; }
+      100% { transform: scale(1.2) translate(-50%, -50%); opacity: 0; }
+    }
+    .fpt-label {
+      display: none;
+      font-size: 24px;
+      font-weight: bold;
+      color: red;
+      animation: fadeIn 1s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <script>
+    const red = "#FF0000";
+    const black = "#000000";
+    const isRedLeft = Math.random() < 0.5;
+    const leftColor = isRedLeft ? red : black;
+    const rightColor = isRedLeft ? black : red;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const explosion = document.querySelector('.explosion');
+      const label = document.querySelector('.fpt-label');
+      setTimeout(() => {
+        explosion.style.display = 'block';
+        label.style.display = 'block';
+      }, 3000);
+    });
+  </script>
+
+  <div class="collision-container">
+    <div class="car left" style="background: ${leftColor};"></div>
+    <div class="car right" style="background: ${rightColor};"></div>
+    <div class="explosion"></div>
+  </div>
+  <div class="fpt-label">FPTSHOP YÊN KHÁNH</div>
+
+  <img src="your-logo.png" class="logo" alt="Logo Yên Khánh">
+  <h2>Mã Vạch Hỗ Trợ: TuyenTA4@fpt.com - 0977989605</h2>
+
+  <input type="text" id="qrText" placeholder="Nhập mã, cách nhau bởi dấu cách hoặc dấu nháy đơn" style="width: 50%;">
+  <br>
+  <button onclick="generateQRCodes()">Tạo mã QR</button>
+  <button onclick="generateBarcodes()">Tạo mã Vạch</button>
+  <button onclick="clearText()">Xóa Text</button>
+
+  <div class="qr-container" id="qrContainer"></div>
+  <div class="barcode-container" id="barcodeContainer"></div>
+
+  <script>
+    
+   function generateQRCodes() {
+    const input = document.getElementById("qrText").value.trim();
+    const qrContainer = document.getElementById("qrContainer");
+    const barcodeContainer = document.getElementById("barcodeContainer");
+
+    qrContainer.innerHTML = "";
+    barcodeContainer.innerHTML = "";
+
+    // Tách từng sản phẩm bằng dấu nháy đơn
+    const products = input.split("'").filter(item => item.trim());
+
+    products.forEach(product => {
+        // Mỗi sản phẩm gồm mã và số lượng, cách nhau bằng khoảng trắng hoặc Tab
+        const parts = product.trim().split(/\s+/);
+        const code = parts[0];
+        const quantity = parts[1] || "";
+
+        if (!code) return;
+
+        const div = document.createElement("div");
+        div.className = "qr-box";
+
+        const qr = document.createElement("div");
+
+        // Chỉ mã sản phẩm được đưa vào QR, không bao gồm số lượng
+        new QRCode(qr, {
+            text: code,
+            width: 150,
+            height: 150
+        });
+
+        const label = document.createElement("p");
+        label.textContent = code;
+
+        div.appendChild(qr);
+        div.appendChild(label);
+
+        // Hiển thị số lượng riêng bên dưới mã sản phẩm
+        if (quantity !== "") {
+            const qtyLabel = document.createElement("p");
+            qtyLabel.textContent = "SL: " + quantity;
+            qtyLabel.style.fontWeight = "bold";
+            qtyLabel.style.color = "#16803c";
+            div.appendChild(qtyLabel);
+        }
+
+        qrContainer.appendChild(div);
+    });
+}
+
+    function generateBarcodes() {
+      const input = document.getElementById("qrText").value.trim();
+      const data = input.split(/\s+|'/);
+      const qrContainer = document.getElementById("qrContainer");
+      const barcodeContainer = document.getElementById("barcodeContainer");
+      qrContainer.innerHTML = "";
+      barcodeContainer.innerHTML = "";
+
+      data.forEach((text) => {
+        if (text.trim() === "") return;
+
+        const row = document.createElement("div");
+        row.className = "barcode-container";
+
+        const div = document.createElement("div");
+        div.className = "barcode-box";
+
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        JsBarcode(svg, text, {
+          format: "CODE128",
+          width: 2,
+          height: 80,
+          displayValue: true
+        });
+
+        const label = document.createElement("p");
+        label.textContent = text;
+
+        div.appendChild(svg);
+        div.appendChild(label);
+        row.appendChild(div);
+        barcodeContainer.appendChild(row);
+      });
+    }
+
+    function clearText() {
+      document.getElementById("qrText").value = "";
+      document.getElementById("qrContainer").innerHTML = "";
+      document.getElementById("barcodeContainer").innerHTML = "";
+    }
+  </script>
+</body>
+</html>
